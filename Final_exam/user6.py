@@ -9,17 +9,21 @@ class BankAccount:
         self.currenBalance = 0  
         self.transaction_history = [] 
 
-        self.count_loan = 0
+        self.count_loan_cont = 0
+        self.total_loan_amount = 0
+
 
     def loan_taking(self, amount):
-        if self.count_loan < 2:
-            self.currenBalance += amount
-            self.count_loan += 1
+        if self.count_loan_cont < 2 and amount < self.currenBalance:
+            self.currenBalance -= amount
+            self.count_loan_cont += 1
+            self.total_loan_amount += amount
             self.transaction_history.append(f"Taking loan amount {amount}")
-            print('----Taking loan Successfully-------')
-        else:
-            print('--Sorry . Maximum two time , you can take loan')
 
+            print(f" Total amount Loan is  :{self.total_loan_amount} taken.")
+        else:
+            print(f"-----Sorry----Loan of taken..")
+        
 
     def transaction_history_check(self):
         if self.transaction_history:
@@ -31,7 +35,7 @@ class BankAccount:
 
 
     def check_balance(self):
-        print(f"Available balance is ${self.balance}")
+        print(f"Available balance is {self.currenBalance}")
 
     def deposit(self,amount):
         if amount >=0 :
@@ -53,8 +57,10 @@ account = BankAccount("imon", "imon@example.com", "chain St", "savings")
 
 account.deposit(1000)
 account.loan_taking(500)  # first loan
-account.loan_taking(700)  # second loan
-account.transaction_history_check()
+account.loan_taking(100)  # second loan
 
-account.loan_taking(200)  # limit cross
+# account.transaction_history_check()
+
+# account.loan_taking(200)  # limit cross
 account.transaction_history_check()
+account.check_balance()

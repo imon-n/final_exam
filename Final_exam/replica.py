@@ -1,12 +1,5 @@
 # Replica
-# Admin⇒                                                                                                                             
-# 1.Can create an account                                                                        
-# 2.Can delete any user account                                                              
-# 3.Can see all user accounts list                                                            
-# 4.Can check the total available balance of the bank.                            
-# 5.Can check the total loan amount.                                                       
-# 6.Can on or off the loan feature of the bank.     
-
+# Replica (for user/admin)
 class BankAccount:
     accounts = []
     loan_amount = 0
@@ -16,19 +9,21 @@ class BankAccount:
         self.address = address      
         self.currenBalance = 0  
         self.transaction_history = [] 
-        self.count_loan = 0
+        self.count_loan_cont = 0
+        self.total_loan_amount = 0
 
         BankAccount.accounts.append(self)
 
     def loan_taking(self, amount):
-        if self.count_loan < 2:
-            self.currenBalance += amount
-            BankAccount.loan_amount += amount
-            self.count_loan += 1
+        if self.count_loan_cont < 2 and amount < self.currenBalance:
+            self.currenBalance -= amount
+            self.count_loan_cont += 1
+            self.total_loan_amount += amount
             self.transaction_history.append(f"Taking loan amount {amount}")
-            print('----Taking loan Successfully-------')
+
+            print(f" Total amount Loan is  :{self.total_loan_amount} taken.")
         else:
-            print('--Sorry . Maximum two time , you can take loan')
+            print(f"-----Sorry----Loan of taken..")
 
 
     def transaction_history_check(self):
@@ -41,7 +36,7 @@ class BankAccount:
 
 
     def check_balance(self):
-        print(f"Available balance is ${self.currenBalance}")
+        print(f"Available balance is : {self.currenBalance}")
 
     def deposit(self,amount):
         if amount >=0 :
@@ -110,72 +105,128 @@ class Admin(User):
             print('---Account is unavailable or not found----')
 
 
-    # 3.Can see all user accounts list  
-    # 3.Can see all user accounts list  
+
     def see_all_accounts(self):
         for acc in BankAccount.accounts:
             print(f'Name is : {acc.name}, Email is : {acc.email}')
 
 
 
-admin = Admin('Imon', 'imon@gmail.com','29','CU')
-admin2 = Admin('ooImon', 'himon@gmail.com','29','CU')
+admin = Admin('imon', 'imon@','29','CU')
 
+user = BankAccount("imon", "imon@", "chain St")
+
+currentAdmin = None
 currentUser = None
 
-while(True):
-    if currentUser == None:
-        ch = input('\n login or Register? (L/R) : ')
-        if ch == 'R':
-            name = input('Enter your name : ')
-            email = input('Enter your Email : ')
-            password = input('Enter password : ')
-            address = input('Enter adress : ')
+op = input('\n User/Admin -----? (ad/us) : ')
 
-            currentUser = Admin(name, email, password, address)
+while True:
+    if op == 'us':
+        if currentUser == None:
+            ch = input('\n login or Register(user)? (L/R) : ')
+            if ch == 'R':
+                name = input('Enter your name : ')
+                email = input('Enter your Email : ')
+                address = input('Enter adress : ')
+                currentUser = BankAccount(name, email, address)
         
+            else:
+                email = input('Enter your Email : ')
+                if email == user.email:
+                    currentUser = user
+                        
         else:
-            email = input('Enter your Email : ')
-            password = input('Enter password : ')
+            print()
+            print(f'------ welcome {currentUser.name} ------')
 
-            for addmin in Admin.total_accounts:
-                if email == addmin.email and password == addmin.password:
-                    currentUser = addmin
-                    break
+            print('1. Check Balance')
+            print('2. Deposit Money')
+            print('3. Withdraw Money')
+            print('5. Take Loan')
+            print('6. View Transaction History')  
+            print('7. logOut')
+
+            choice = input('\nEnter your choice: ')
+
+            if choice == '7':
+                currentUser = None
+                print('Logged out successfully.')
+
+            elif choice == '1':
+                currentUser.check_balance()
+
+            elif choice == '2':
+                amount = int(input('Enter the amount to deposit: '))
+                currentUser.deposit(amount)
+                print('Deposit successful.')
+
+            elif choice == '3':
+                amount = int(input('Enter the amount to withdraw: '))
+                currentUser.withdraw(amount)
+                print('Withdrawal successful.')
+
+            elif choice == '5':
+                amount = int(input('Enter the loan amount: '))
+                currentUser.loan_taking(amount)
+
+            elif choice == '6':
+                currentUser.transaction_history_check()
 
     else:
-        print()
-        print(f'------ welcome {currentUser.name} ------')
-        print()
-        print('Chose Options')
-        print('1.Creat Account')
-        print('2.Delete Account')
-        print('3.See all Account')
-        print('5.total_loan_amount')
-        print('6.loan feater now(ON/OFF)')
-        print('7.Logout')
-        print('')
-        op = int(input('chose your options : '))
-        if op == 1:
-            new_name = input('Enter your name : ')
-            new_email = input('Enter your Email : ')
-            address = input('Enter address : ')
-            new_acc = currentUser.create_account(new_name,new_email,address)
+        if currentAdmin == None:
+            ch = input('\n login or Register(Adimn) ? (L/R) : ')
+            if ch == 'R':
+                name = input('Enter your name : ')
+                email = input('Enter your Email : ')
+                password = input('Enter password : ')
+                address = input('Enter adress : ')
 
-        elif op == 2:
-            currentUser.delete_account(new_acc)
+                currentAdmin = Admin(name, email, password, address)
+        
+            else:
+                email = input('Enter your Email : ')
+                password = input('Enter password : ')
 
-        elif op == 3:
-            currentUser.see_all_accounts()
-
-        elif op == 5:
-            currentUser.total_loan_amount()
-
-        elif op == 6:
-            currentUser.loan_feature_now()
-
-        elif op == 7:
-            break
+                if email == admin.email and password == admin.password:
+                    currentAdmin = addmin
+                else:
+                    print('--Wrong email/password,\n please, try again---')
 
         else:
-            print('------Invalid Option---------')
+            print()
+            print(f'------ welcome {currentAdmin.name} ------')
+            print()
+            print('Chose Options')
+            print('1.Creat Account')
+            print('2.Delete Account')
+            print('3.See all Account')
+            print('5.total_loan_amount')
+            print('6.loan feater now(ON/OFF)')
+            print('7.Logout')
+            print('')
+            op = int(input('chose your options : '))
+            if op == 1:
+                new_name = input('Enter your name : ')
+                new_email = input('Enter your Email : ')
+                address = input('Enter address : ')
+                new_acc = currentAdmin.create_account(new_name,new_email,address)
+
+            elif op == 2:
+                currentAdmin.delete_account(new_acc)
+
+            elif op == 3:
+                currentAdmin.see_all_accounts()
+
+            elif op == 5:
+                currentAdmin.total_loan_amount()
+
+            elif op == 6:
+                currentAdmin.loan_feature_now()
+
+            elif op == 7:
+                currentAdmin = None
+                print('Logged out successfully.')
+
+            else:
+                print('------Invalid Option---------')
